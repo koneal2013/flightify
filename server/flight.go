@@ -35,11 +35,11 @@ func (i *flightItinerary) computeOrigin() error {
 			return ComputeOriginErr
 		}
 		// count the occurrence of origin and destination airport codes to determine connections
-		originCount[segment.Origin]--
+		originCount[segment.Origin] += 0
 		originCount[segment.Destination]++
 	}
 	for key, count := range originCount {
-		if count == -1 {
+		if count == 0 {
 			i.Origin = key
 		}
 	}
@@ -60,11 +60,11 @@ func (i *flightItinerary) computeFinalDestination() error {
 			return ComputeFinalDestinationErr
 		}
 		// count the occurrence of origin and destination airport codes to determine connections
-		destinationCount[segment.Destination]--
+		destinationCount[segment.Destination] += 0
 		destinationCount[segment.Origin]++
 	}
 	for key, count := range destinationCount {
-		if count == -1 {
+		if count == 0 {
 			i.FinalDestination = key
 		}
 	}

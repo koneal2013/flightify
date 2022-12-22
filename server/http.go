@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -51,15 +50,12 @@ func handleCalculate(w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal(data, &input)
 		flight := &flightItinerary{}
 		for _, val := range input {
-			if origin, dest, ok := strings.Cut(val[0], ","); !ok {
-				http.Error(w, "error parsing the input provided", http.StatusBadRequest)
-				return
-			} else {
-				flight.Segments = append(flight.Segments, &flightSegment{
-					Origin:      origin,
-					Destination: dest,
-				})
-			}
+			origin := val[0]
+			dest := val[1]
+			flight.Segments = append(flight.Segments, &flightSegment{
+				Origin:      origin,
+				Destination: dest,
+			})
 		}
 		if err := flight.computeOrigin(); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -67,8 +63,9 @@ func handleCalculate(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		} else {
 			output := make([][]string, 1)
-			output[0] = make([]string, 1)
-			output[0][0] = fmt.Sprintf("%s,%s", flight.Origin, flight.FinalDestination)
+			output[0] = make([]string, 2)
+			output[0][0] = flight.Origin
+			output[0][1] = flight.FinalDestination
 			w.Header().Add("Content-Type", "application/json")
 			outputBytes, _ := json.Marshal(output)
 			w.Write(outputBytes)

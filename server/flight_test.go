@@ -18,7 +18,7 @@ func TestComputeOriginAndFinalDestination(t *testing.T) {
 			input: &flightItinerary{
 				Segments: []*flightSegment{
 					{
-						Origin:      "SFO",
+						Origin:      "DFW",
 						Destination: "DFW",
 					},
 					{
@@ -72,6 +72,26 @@ func TestComputeOriginAndFinalDestination(t *testing.T) {
 				},
 			},
 			expectedOutput: &flightItinerary{Origin: "SFO", FinalDestination: "EWR"},
+		},
+		{
+			name: "success itinerary with two connections",
+			input: &flightItinerary{
+				Segments: []*flightSegment{
+					{
+						Origin:      "DFW",
+						Destination: "CHA",
+					},
+					{
+						Origin:      "FAT",
+						Destination: "DFW",
+					},
+					{
+						Origin:      "CHA",
+						Destination: "ATL",
+					},
+				},
+			},
+			expectedOutput: &flightItinerary{Origin: "FAT", FinalDestination: "ATL"},
 		},
 		{
 			name: "success itinerary with more that one connection",
