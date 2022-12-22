@@ -1,17 +1,17 @@
 FROM golang:1.19-alpine as build
 # Set the working directory
-WORKDIR /go/src/backendify
+WORKDIR /go/src/flightify
 # Copy and download dependencies using go mod
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
 # Copy the source files from the host
-COPY . /go/src/backendify
+COPY . /go/src/flightify
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o backendify
+RUN CGO_ENABLED=0 GOOS=linux go build -o flightify
 
 FROM scratch
-COPY --from=build /go/src/backendify/backendify  .
+COPY --from=build /go/src/flightify/flightify  .
 
 EXPOSE 8080
 ENTRYPOINT ["/flightify"]

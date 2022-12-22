@@ -4,9 +4,16 @@ start:
 	@echo "running main program..."
 	@./flightify
 
+docker-start:
+	@make docker-build
+	@docker run -p 8080:8080 --name flightify docker.io/koneal2013/flightify:latest
+
 build:
 	@make test
 	@go build
+
+docker-build:
+	@docker build . -t koneal2013/flightify
 
 clean:
 	@go clean -i
