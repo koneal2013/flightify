@@ -7,7 +7,7 @@ import (
 var (
 	computeOriginErr           = errors.New("invalid flight plan provided: unable to compute origin")
 	computeFinalDestinationErr = errors.New("invalid flight plan provided: unable to compute final destination")
-	noConnectionsErr           = errors.New("invalid flight plan provided: flight itinerary is not non stop and no connections were provided")
+	noConnectionsErr           = errors.New("invalid flight plan provided: flight itinerary is not non stop and one or more connections are missing")
 )
 
 type flightSegment struct {

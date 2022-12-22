@@ -13,5 +13,4 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o flightify
 FROM scratch
 COPY --from=build /go/src/flightify/flightify  .
 
-EXPOSE 8080
 ENTRYPOINT ["/flightify"]

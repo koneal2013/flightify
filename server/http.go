@@ -8,6 +8,9 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
+
+	"github.com/swaggo/http-swagger"
+	_ "github.com/swaggo/http-swagger/example/go-chi/docs"
 )
 
 func NewHTTPServer(cfg Config) *http.Server {
@@ -27,6 +30,7 @@ func NewHTTPServer(cfg Config) *http.Server {
 	r := mux.NewRouter()
 	r.HandleFunc("/calculate", handleCalculate).Methods("POST")
 	r.HandleFunc("/status", handleStatus).Methods("GET")
+	r.HandleFunc("/swagger/*", httpSwagger.Handler(httpSwagger.URL(fmt.Sprintf("http://localhost:%d/swagger/doc.json", cfg.Port)))).Methods("GET")
 	for _, middlewareFunc := range cfg.MiddlewareFuncs {
 		r.Use(middlewareFunc)
 	}
@@ -36,9 +40,25 @@ func NewHTTPServer(cfg Config) *http.Server {
 	}
 }
 
+// Status godoc
+//
+//	@Description	Return 200 OK if server is ready to accept requests
+//	@Success		200	{object}	string
+//
+//	@Router			/status [get]
 func handleStatus(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }
 
+// Calculate godoc
+//
+//	@Description	Returns a flight itinerary with origin airport code and final destination airport code
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		string	true	"slice of flight segments (i.e. [['ATL', 'EWR'], ['SFO', 'ATL']])"
+//	@Success		200		{object}	string
+//	@Failure		400		{object}	string
+//	@Router			/calculate [post]
 func handleCalculate(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var input [][]string

@@ -36,3 +36,4 @@ make covero
 ```
 
 ### API
+API documentation can be found [here](./docs/markdown.md)

@@ -1,0 +1,45 @@
+host: localhost:8080
+info:
+  contact:
+    email: koneal2013@gmail.com
+    name: Kenston O'Neal
+  description: Api documentation for Flightify service.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Flightify API
+  version: "1.0"
+paths:
+  /calculate:
+    post:
+      consumes:
+      - application/json
+      description: Returns a flight itinerary with origin airport code and final destination
+        airport code
+      parameters:
+      - description: slice of flight segments (i.e. [['ATL', 'EWR'], ['SFO', 'ATL']])
+        in: body
+        name: input
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+  /status:
+    get:
+      description: Return 200 OK if server is ready to accept requests
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+swagger: "2.0"

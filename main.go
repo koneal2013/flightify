@@ -7,6 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	_ "github.com/swaggo/http-swagger/example/go-chi/docs"
 )
 
 type cli struct {
@@ -41,6 +43,17 @@ func setupFlags(cmd *cobra.Command) error {
 	return viper.BindPFlags(cmd.Flags())
 }
 
+//	@title			Flightify API
+//	@version		1.0
+//	@description	Api documentation for Flightify service.
+
+//	@contact.name	Kenston O'Neal
+//	@contact.email	koneal2013@gmail.com
+
+//	@license.name	Apache 2.0
+//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host	localhost:8080
 func main() {
 	cli := &cli{}
 

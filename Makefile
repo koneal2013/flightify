@@ -6,14 +6,14 @@ start:
 
 docker-start:
 	@make docker-build
-	@docker run -p 8080:8080 --name flightify docker.io/koneal2013/flightify:latest
+	@docker run -p 8080:8080 -d --name flightify docker.io/koneal2013/flightify:latest
 
 build:
 	@make test
 	@go build
 
 docker-build:
-	@docker rm flightify
+	@docker rm flightify || true
 	@docker build . -t koneal2013/flightify
 
 clean:
