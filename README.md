@@ -5,7 +5,7 @@ A flight path tracker that helps express how a particular traveler's flight path
 
 you can start Flightify in a terminal window or by building and running a docker container. 
 ```bash
-make start
+make start args=<list args here. seperate by space.>
 ```
 or
 
