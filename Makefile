@@ -2,7 +2,7 @@ start:
 	@make clean
 	@make build
 	@echo "running main program..."
-	@./flightify
+	@./flightify $(args)
 
 docker-start:
 	@make docker-build
@@ -21,14 +21,14 @@ clean:
 
 testq:
 	@echo "running tests..."
-	go test ./*/*
+	go test ./server/*
 
 test:
 	@make testqv
 
 testqv:
 	@echo "running tests..."
-	go test -v ./*/*
+	go test -v ./server/*.go
 
 cover:
 	@mkdir .coverage || echo "hidden coverage folder exists"

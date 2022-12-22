@@ -31,9 +31,7 @@ func NewHTTPServer(cfg Config) *http.Server {
 	r.HandleFunc("/calculate", handleCalculate).Methods("POST")
 	r.HandleFunc("/status", handleStatus).Methods("GET")
 	r.HandleFunc("/swagger/*", httpSwagger.Handler(httpSwagger.URL(fmt.Sprintf("http://localhost:%d/swagger/doc.json", cfg.Port)))).Methods("GET")
-	for _, middlewareFunc := range cfg.MiddlewareFuncs {
-		r.Use(middlewareFunc)
-	}
+	r.Use(cfg.MiddlewareFuncs...)
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Port),
 		Handler: r,

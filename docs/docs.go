@@ -34,7 +34,7 @@ const docTemplate = `{
                 ],
                 "parameters": [
                     {
-                        "description": "slice of flight segments (i.e. [['ATL', 'EWR'], ['SFO', 'ATL']])",
+                        "description": "(i.e. [[",
                         "name": "input",
                         "in": "body",
                         "required": true,
@@ -52,19 +52,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/status": {
-            "get": {
-                "description": "Return 200 OK if server is ready to accept requests",
-                "responses": {
-                    "200": {
-                        "description": "OK",
                         "schema": {
                             "type": "string"
                         }

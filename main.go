@@ -3,6 +3,10 @@ package main
 import (
 	"log"
 
+	"github.com/purini-to/zapmw"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+
 	"github.com/koneal2013/flightify/server"
 
 	"github.com/spf13/cobra"
@@ -27,6 +31,10 @@ func (c *cli) setupConfig(cmd *cobra.Command, args []string) error {
 		}
 		c.cfg.Port = viper.GetInt("port")
 		c.cfg.IsDevelopment = viper.GetBool("is-development")
+		if viper.GetBool("enable-logging-middleware") {
+			// log each request with the global zap logger (initialized in server.NewHTTPServer)
+			c.cfg.MiddlewareFuncs = append(c.cfg.MiddlewareFuncs, zapmw.WithZap(zap.L()), zapmw.Request(zapcore.InfoLevel, "processing request"), zapmw.Recoverer(zapcore.ErrorLevel, "recover", zapmw.RecovererDefault))
+		}
 	}
 	return nil
 }
@@ -38,8 +46,9 @@ func (c *cli) run(cmd *cobra.Command, args []string) error {
 
 func setupFlags(cmd *cobra.Command) error {
 	cmd.Flags().String("config-file", "", "Path to config file.")
-	cmd.Flags().Bool("is-development", false, "Flag to set log level.")
+	cmd.Flags().Bool("is-development", true, "Flag to set log level.")
 	cmd.Flags().Int("port", 8080, "Port to serve on.")
+	cmd.Flags().Bool("enable-logging-middleware", true, "Enable logging of each request")
 	return viper.BindPFlags(cmd.Flags())
 }
 
