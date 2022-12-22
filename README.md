@@ -13,7 +13,7 @@ or
 make docker-start
 ```
 
-Flightify will listen on port 8080 by default. Optionally, you can provide a configuration file (.yaml or .json) to override the default configuration.
+Flightify will listen on port 8080 by default. Optionally, you can provide a configuration file (.yaml or .json) to override the default configuration. see [config.json](./config.json) for an example of what values can be overridden.
 
 ### Test
 
