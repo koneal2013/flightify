@@ -27,7 +27,23 @@ func TestComputeOriginAndFinalDestination(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: ComputeOriginErr,
+			expectedErr: computeOriginErr,
+		},
+		{
+			name: "failure not non stop / no connections found",
+			input: &flightItinerary{
+				Segments: []*flightSegment{
+					{
+						Origin:      "IND",
+						Destination: "EWR",
+					},
+					{
+						Origin:      "DFW",
+						Destination: "SFO",
+					},
+				},
+			},
+			expectedErr: noConnectionsErr,
 		},
 		{
 			name: "failure invalid input for final Destination",
@@ -43,7 +59,7 @@ func TestComputeOriginAndFinalDestination(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: ComputeFinalDestinationErr,
+			expectedErr: computeFinalDestinationErr,
 		},
 		{
 			name: "success non stop itinerary",
@@ -141,10 +157,12 @@ func TestComputeOriginAndFinalDestination(t *testing.T) {
 			if tc.expectedOutput != nil {
 				require.Equal(t, tc.expectedOutput.Origin, tc.input.Origin)
 				require.Equal(t, tc.expectedOutput.FinalDestination, tc.input.FinalDestination)
-			} else if tc.expectedErr == ComputeOriginErr {
+			} else if tc.expectedErr == computeOriginErr {
 				require.Error(t, computeOriginErr)
-			} else if tc.expectedErr == ComputeFinalDestinationErr {
+				require.Equal(t, tc.expectedErr, computeOriginErr)
+			} else if tc.expectedErr == computeFinalDestinationErr {
 				require.Error(t, computeFinalDestinationErr)
+				require.Equal(t, tc.expectedErr, computeFinalDestinationErr)
 			}
 		})
 

@@ -5,8 +5,9 @@ import (
 )
 
 var (
-	ComputeOriginErr           = errors.New("invalid flight plan provided: unable to compute origin")
-	ComputeFinalDestinationErr = errors.New("invalid flight plan provided: unable to compute final destination")
+	computeOriginErr           = errors.New("invalid flight plan provided: unable to compute origin")
+	computeFinalDestinationErr = errors.New("invalid flight plan provided: unable to compute final destination")
+	noConnectionsErr           = errors.New("invalid flight plan provided: flight itinerary is not non stop and no connections were provided")
 )
 
 type flightSegment struct {
@@ -24,6 +25,7 @@ func (i *flightItinerary) isNonStop() bool {
 	return len(i.Segments) == 1
 }
 
+// computeOrigin finds the flight itinerary's origin from a list of flight segments
 func (i *flightItinerary) computeOrigin() error {
 	if i.isNonStop() {
 		i.Origin = i.Segments[0].Origin
@@ -32,7 +34,7 @@ func (i *flightItinerary) computeOrigin() error {
 	originCount := make(map[string]int, len(i.Segments))
 	for _, segment := range i.Segments {
 		if segment.Origin == segment.Destination {
-			return ComputeOriginErr
+			return computeOriginErr
 		}
 		// count the occurrence of origin and destination airport codes to determine connections
 		originCount[segment.Origin] += 0
@@ -44,11 +46,12 @@ func (i *flightItinerary) computeOrigin() error {
 		}
 	}
 	if i.Origin == "" {
-		return ComputeOriginErr
+		return computeOriginErr
 	}
 	return nil
 }
 
+// computeFinalDestination finds the flight itinerary's final destination from a list of flight segments
 func (i *flightItinerary) computeFinalDestination() error {
 	if i.isNonStop() {
 		i.FinalDestination = i.Segments[0].Destination
@@ -57,19 +60,24 @@ func (i *flightItinerary) computeFinalDestination() error {
 	destinationCount := make(map[string]int, len(i.Segments))
 	for _, segment := range i.Segments {
 		if segment.Origin == segment.Destination {
-			return ComputeFinalDestinationErr
+			return computeFinalDestinationErr
 		}
 		// count the occurrence of origin and destination airport codes to determine connections
 		destinationCount[segment.Destination] += 0
 		destinationCount[segment.Origin]++
 	}
+	var finalDestination []string
 	for key, count := range destinationCount {
 		if count == 0 {
-			i.FinalDestination = key
+			finalDestination = append(finalDestination, key)
 		}
 	}
+	if len(finalDestination) != 1 {
+		return noConnectionsErr
+	}
+	i.FinalDestination = finalDestination[0]
 	if i.FinalDestination == "" {
-		return ComputeFinalDestinationErr
+		return computeFinalDestinationErr
 	}
 	return nil
 }

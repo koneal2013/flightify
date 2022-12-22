@@ -13,6 +13,7 @@ build:
 	@go build
 
 docker-build:
+	@docker rm flightify
 	@docker build . -t koneal2013/flightify
 
 clean:
