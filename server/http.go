@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 
@@ -38,37 +37,33 @@ func NewHTTPServer(cfg Config) *http.Server {
 }
 
 func handleStatus(w http.ResponseWriter, r *http.Request) {
-
 }
 
 func handleCalculate(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	if data, err := io.ReadAll(r.Body); err != nil {
-		http.Error(w, err.Error(), http.StatusNoContent)
+	var input [][]string
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	flight := &flightItinerary{}
+	for _, val := range input {
+		origin := val[0]
+		dest := val[1]
+		flight.Segments = append(flight.Segments, &flightSegment{
+			Origin:      origin,
+			Destination: dest,
+		})
+	}
+	if err := flight.computeOrigin(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	} else if err := flight.computeFinalDestination(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 	} else {
-		var input [][]string
-		json.Unmarshal(data, &input)
-		flight := &flightItinerary{}
-		for _, val := range input {
-			origin := val[0]
-			dest := val[1]
-			flight.Segments = append(flight.Segments, &flightSegment{
-				Origin:      origin,
-				Destination: dest,
-			})
-		}
-		if err := flight.computeOrigin(); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		} else if err := flight.computeFinalDestination(); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		} else {
-			output := make([][]string, 1)
-			output[0] = make([]string, 2)
-			output[0][0] = flight.Origin
-			output[0][1] = flight.FinalDestination
-			w.Header().Add("Content-Type", "application/json")
-			outputBytes, _ := json.Marshal(output)
-			w.Write(outputBytes)
-		}
+		output := make([][]string, 1)
+		output[0] = make([]string, 2)
+		output[0][0] = flight.Origin
+		output[0][1] = flight.FinalDestination
+		w.Header().Add("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(output)
 	}
 }
