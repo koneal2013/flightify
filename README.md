@@ -5,7 +5,7 @@ A flight path tracker that helps express how a particular traveler's flight path
 
 you can start Flightify in a terminal window or by building and running a docker container. 
 ```bash
-make start args=<list args here. seperate by space.>
+make start
 ```
 or
 
@@ -13,7 +13,7 @@ or
 make docker-start
 ```
 
-Flightify will listen on port 8080 by default. Optionally, you can provide a configuration file (.yaml or .json) to override the default configuration. see [config.json](./config.json) for an example of what values can be overridden.
+Flightify will listen on port 8080 by default. Optionally, you can override the default configuration via the [config.json](./config.json) file. The config file ([config.json](./config.json)) is automatically passed as an argument to the `make start` and `make docker-start` commands (see [setup and run](#set-up-and-run)) and must be present in the project root to build.  See [config.json](./config.json) for an example of what values can be overridden.
 
 ### Test
 

@@ -12,5 +12,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o flightify
 
 FROM scratch
 COPY --from=build /go/src/flightify/flightify  .
+COPY --from=build /go/src/flightify/config.json  .
 
-ENTRYPOINT ["/flightify"]
+ENTRYPOINT ["/flightify", "--config-file=./config.json"]
