@@ -76,8 +76,5 @@ func (i *flightItinerary) computeFinalDestination() error {
 		return noConnectionsErr
 	}
 	i.FinalDestination = finalDestination[0]
-	if i.FinalDestination == "" {
-		return computeFinalDestinationErr
-	}
 	return nil
 }
