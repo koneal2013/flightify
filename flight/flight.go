@@ -1,4 +1,4 @@
-package server
+package flight
 
 import (
 	"errors"
@@ -10,23 +10,38 @@ var (
 	noConnectionsErr           = errors.New("invalid flight plan provided: flight itinerary is not non stop and one or more connections are missing")
 )
 
-type flightSegment struct {
-	Origin      string `json:"origin"`
-	Destination string `json:"destination"`
+type Segment struct {
+	Origin      string `json:"0"`
+	Destination string `json:"1"`
 }
 
-type flightItinerary struct {
-	Origin           string           `json:"origin"`
-	FinalDestination string           `json:"finalDestination"`
-	Segments         []*flightSegment `json:"segments"`
+type Itinerary struct {
+	Origin           string     `json:"origin"`
+	FinalDestination string     `json:"finalDestination"`
+	Segments         []*Segment `json:"segments"`
 }
 
-func (i *flightItinerary) isNonStop() bool {
+func New(segments [][]string) (*Itinerary, error) {
+	if len(segments) <= 0 {
+		return nil, errors.New("no segments provided")
+	}
+	itinerary := &Itinerary{}
+	for _, segment := range segments {
+		newSegment := &Segment{
+			Origin:      segment[0],
+			Destination: segment[1],
+		}
+		itinerary.Segments = append(itinerary.Segments, newSegment)
+	}
+	return itinerary, nil
+}
+
+func (i *Itinerary) isNonStop() bool {
 	return len(i.Segments) == 1
 }
 
-// computeOrigin finds the flight itinerary's origin from a list of flight segments
-func (i *flightItinerary) computeOrigin() error {
+// ComputeOrigin finds the flight itinerary's origin from a list of flight segments
+func (i *Itinerary) ComputeOrigin() error {
 	if i.isNonStop() {
 		i.Origin = i.Segments[0].Origin
 		return nil
@@ -51,8 +66,8 @@ func (i *flightItinerary) computeOrigin() error {
 	return nil
 }
 
-// computeFinalDestination finds the flight itinerary's final destination from a list of flight segments
-func (i *flightItinerary) computeFinalDestination() error {
+// ComputeFinalDestination finds the flight itinerary's final destination from a list of flight segments
+func (i *Itinerary) ComputeFinalDestination() error {
 	if i.isNonStop() {
 		i.FinalDestination = i.Segments[0].Destination
 		return nil

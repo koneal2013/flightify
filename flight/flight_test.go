@@ -1,4 +1,4 @@
-package server
+package flight
 
 import (
 	"testing"
@@ -9,14 +9,14 @@ import (
 func TestComputeOriginAndFinalDestination(t *testing.T) {
 	for _, tc := range []struct {
 		name           string
-		input          *flightItinerary
-		expectedOutput *flightItinerary
+		input          *Itinerary
+		expectedOutput *Itinerary
 		expectedErr    error
 	}{
 		{
 			name: "failure invalid input for origin",
-			input: &flightItinerary{
-				Segments: []*flightSegment{
+			input: &Itinerary{
+				Segments: []*Segment{
 					{
 						Origin:      "DFW",
 						Destination: "DFW",
@@ -31,8 +31,8 @@ func TestComputeOriginAndFinalDestination(t *testing.T) {
 		},
 		{
 			name: "failure not non stop / no connections found",
-			input: &flightItinerary{
-				Segments: []*flightSegment{
+			input: &Itinerary{
+				Segments: []*Segment{
 					{
 						Origin:      "IND",
 						Destination: "EWR",
@@ -47,8 +47,8 @@ func TestComputeOriginAndFinalDestination(t *testing.T) {
 		},
 		{
 			name: "failure invalid input for final Destination",
-			input: &flightItinerary{
-				Segments: []*flightSegment{
+			input: &Itinerary{
+				Segments: []*Segment{
 					{
 						Origin:      "SFO",
 						Destination: "DFW",
@@ -63,20 +63,20 @@ func TestComputeOriginAndFinalDestination(t *testing.T) {
 		},
 		{
 			name: "success non stop itinerary",
-			input: &flightItinerary{
-				Segments: []*flightSegment{
+			input: &Itinerary{
+				Segments: []*Segment{
 					{
 						Origin:      "SFO",
 						Destination: "EWR",
 					},
 				},
 			},
-			expectedOutput: &flightItinerary{Origin: "SFO", FinalDestination: "EWR"},
+			expectedOutput: &Itinerary{Origin: "SFO", FinalDestination: "EWR"},
 		},
 		{
 			name: "success itinerary with one connection",
-			input: &flightItinerary{
-				Segments: []*flightSegment{
+			input: &Itinerary{
+				Segments: []*Segment{
 					{
 						Origin:      "ATL",
 						Destination: "EWR",
@@ -87,12 +87,12 @@ func TestComputeOriginAndFinalDestination(t *testing.T) {
 					},
 				},
 			},
-			expectedOutput: &flightItinerary{Origin: "SFO", FinalDestination: "EWR"},
+			expectedOutput: &Itinerary{Origin: "SFO", FinalDestination: "EWR"},
 		},
 		{
 			name: "success itinerary with two connections",
-			input: &flightItinerary{
-				Segments: []*flightSegment{
+			input: &Itinerary{
+				Segments: []*Segment{
 					{
 						Origin:      "DFW",
 						Destination: "CHA",
@@ -107,12 +107,12 @@ func TestComputeOriginAndFinalDestination(t *testing.T) {
 					},
 				},
 			},
-			expectedOutput: &flightItinerary{Origin: "FAT", FinalDestination: "ATL"},
+			expectedOutput: &Itinerary{Origin: "FAT", FinalDestination: "ATL"},
 		},
 		{
 			name: "success itinerary with more that one connection",
-			input: &flightItinerary{
-				Segments: []*flightSegment{
+			input: &Itinerary{
+				Segments: []*Segment{
 					{
 						Origin:      "IND",
 						Destination: "EWR",
@@ -147,12 +147,12 @@ func TestComputeOriginAndFinalDestination(t *testing.T) {
 					},
 				},
 			},
-			expectedOutput: &flightItinerary{Origin: "DEN", FinalDestination: "CHA"},
+			expectedOutput: &Itinerary{Origin: "DEN", FinalDestination: "CHA"},
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			computeOriginErr := tc.input.computeOrigin()
-			computeFinalDestinationErr := tc.input.computeFinalDestination()
+			computeOriginErr := tc.input.ComputeOrigin()
+			computeFinalDestinationErr := tc.input.ComputeFinalDestination()
 
 			if tc.expectedOutput != nil {
 				require.Equal(t, tc.expectedOutput.Origin, tc.input.Origin)

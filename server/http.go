@@ -1,7 +1,7 @@
 package server
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,6 +11,9 @@ import (
 
 	"github.com/swaggo/http-swagger"
 	_ "github.com/swaggo/http-swagger/example/go-chi/docs"
+
+	"github.com/koneal2013/flightify/adaptor"
+	"github.com/koneal2013/flightify/flight"
 )
 
 func NewHTTPServer(cfg Config) *http.Server {
@@ -28,7 +31,7 @@ func NewHTTPServer(cfg Config) *http.Server {
 		}
 	}
 	r := mux.NewRouter()
-	r.HandleFunc("/calculate", handleCalculate).Methods("POST")
+	r.HandleFunc("/calculate", adaptor.GenericHttpAdaptor(handleCalculate)).Methods("POST")
 	r.HandleFunc("/status", handleStatus).Methods("GET")
 	r.HandleFunc("/swagger/*", httpSwagger.Handler(httpSwagger.URL(fmt.Sprintf("http://localhost:%d/swagger/doc.json", cfg.Port)))).Methods("GET")
 	r.Use(cfg.MiddlewareFuncs...)
@@ -45,7 +48,6 @@ func NewHTTPServer(cfg Config) *http.Server {
 //
 //	@Router			/status [get]
 func handleStatus(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
 }
 
 // Calculate godoc
@@ -57,31 +59,17 @@ func handleStatus(w http.ResponseWriter, r *http.Request) {
 //	@Success		200		{object}	string
 //	@Failure		400		{object}	string
 //	@Router			/calculate [post]
-func handleCalculate(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	var input [][]string
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+
+func handleCalculate(ctx context.Context, in [][]string) (out []string, err error) {
+	f, err := flight.New(in)
+	if err != nil {
+		return
 	}
-	flight := &flightItinerary{}
-	for _, val := range input {
-		origin := val[0]
-		dest := val[1]
-		flight.Segments = append(flight.Segments, &flightSegment{
-			Origin:      origin,
-			Destination: dest,
-		})
+	if err = f.ComputeOrigin(); err != nil {
+		return
+	} else if err = f.ComputeFinalDestination(); err != nil {
+		return
 	}
-	if err := flight.computeOrigin(); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	} else if err := flight.computeFinalDestination(); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	} else {
-		output := make([][]string, 1)
-		output[0] = make([]string, 2)
-		output[0][0] = flight.Origin
-		output[0][1] = flight.FinalDestination
-		w.Header().Add("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(output)
-	}
+	out = []string{f.Origin, f.FinalDestination}
+	return
 }
