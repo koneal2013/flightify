@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/koneal2013/flightify/middleware"
 	"github.com/koneal2013/flightify/server"
 
 	"github.com/spf13/cobra"
@@ -35,6 +36,7 @@ func (c *cli) setupConfig(cmd *cobra.Command, args []string) error {
 			// log each request with the global zap logger (initialized in server.NewHTTPServer)
 			c.cfg.MiddlewareFuncs = append(c.cfg.MiddlewareFuncs, zapmw.WithZap(zap.L()), zapmw.Request(zapcore.InfoLevel, "processing request"), zapmw.Recoverer(zapcore.ErrorLevel, "recover", zapmw.RecovererDefault))
 		}
+		c.cfg.MiddlewareFuncs = append(c.cfg.MiddlewareFuncs, middleware.Recovery)
 	}
 	return nil
 }

@@ -48,6 +48,7 @@ func NewHTTPServer(cfg Config) *http.Server {
 //
 //	@Router			/status [get]
 func handleStatus(w http.ResponseWriter, r *http.Request) {
+
 }
 
 // Calculate godoc
