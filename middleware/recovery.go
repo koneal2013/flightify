@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -12,8 +11,6 @@ func Recovery(next http.Handler) http.Handler {
 		defer func() {
 			err := recover()
 			if err != nil {
-				fmt.Println(err)
-
 				jsonBody, _ := json.Marshal(map[string]string{
 					"error": "There was an internal server error (recovery)",
 				})
@@ -22,10 +19,7 @@ func Recovery(next http.Handler) http.Handler {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write(jsonBody)
 			}
-
 		}()
-
 		next.ServeHTTP(w, r)
-
 	})
 }
